@@ -1,0 +1,9 @@
+version: "2"
+services:
+  test01_saver:
+    image: python:latest
+    build: .
+    container_name: cb01
+    command: bash -c "python esp32-eos-communicator.py"
+    volumes:
+      - ./src:/src
