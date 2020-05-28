@@ -8,13 +8,26 @@ import eospy.keys
 import pytz
 import requests
 
-eos_endpoint = 'https://api.testnet.eos.io'
-bartender_account = 'gaxdyyrkwguk'
+# eos_endpoint = 'https://eosbp.atticlab.net'  # last working
+# eos_endpoint = 'https://api.testnet.eos.io'
+# eos_endpoint = 'https://testnet.eos.dfuse.io/'
+# eos_endpoint = 'http://213.202.230.42:8888'
+# eos_endpoint = 'http://jungle.eosphere.io:443'
+# eos_endpoint = 'http://junglehistory.cryptolions.io:18888'
+# eos_endpoint = 'https://api.jungle.alohaeos.com' #history OK
+# eos_endpoint = 'http://145.239.133.201:8888'
+# eos_endpoint = 'http://junglehistory.cryptolions.io'
+eos_endpoint = 'http://jungle.atticlab.net:8888'
+# eos_endpoint = 'http://145.239.133.201:8888'
+# bartender_account = 'gaxdyyrkwguk'
+bartender_account = 'wealthysnake'
+# bartender_account = 'eosmechanics'
 active_privat_key = os.environ['WINE_VENDOR_PRIVAT_KEY']
+
 
 def send_tokens(token, account_to, quantity, memo):
     # contract_accounts = {'EOS': 'eosio.token', 'KNYGA': 'knygarium111'}
-    contract_accounts = {'TNT': 'eosio.token', 'KNYGA': 'knygarium111'}
+    contract_accounts = {'TNT': 'eosio.token', 'EOS': 'eosio.token', 'KNYGA': 'knygarium111'}
     ce = Cleos(url=eos_endpoint)
     quantity_str = str(quantity)
     qs_start = quantity_str[:quantity_str.find('.')]
@@ -57,8 +70,38 @@ def send_tokens(token, account_to, quantity, memo):
 
         return 0
 
-token = 'TNT'
-receiver_account = 'pawhjmizyyqy'
-sum_for_send = '0.5'
+
+def get_EOS_balance(account):
+    ce = Cleos(url=eos_endpoint)
+    try:
+        EOS_balance_list = ce.get_currency_balance(account)
+        EOS_balance = float(EOS_balance_list[0].split(' ')[0])
+    except (requests.exceptions.HTTPError,
+            requests.exceptions.ConnectionError,
+            requests.exceptions.ReadTimeout,
+            json.decoder.JSONDecodeError):
+        print("Can't get EOS balance")
+        EOS_balance = float(0)
+    return EOS_balance
+
+
+# token = 'TNT'
+token = 'EOS'
+# receiver_account = 'pawhjmizyyqy'
+# receiver_account = 'gaxdyyrkwguk'
+receiver_account = 'wealthytiger'
+sum_for_send = '0.0887'
 transfer_memo = 'test memo'
-print(send_tokens(token, receiver_account, sum_for_send,transfer_memo))
+# print(send_tokens(token, receiver_account, sum_for_send,transfer_memo))
+# ce = Cleos(url=eos_endpoint)
+# actions = ce.get_actions(bartender_account, pos=-1, offset=-20)
+# actions = ce.get_actions(receiver_account, pos=-1, offset=-20)
+# print(actions)
+print(get_EOS_balance(receiver_account))
+
+import pandas as pd
+
+# tables = pd.read_html("https://junglehistory.cryptolions.io/v2/history/get_actions?limit=3&account=wealthysnake")
+tables = pd.read_html("http://egle.ua")
+
+print(tables[0])

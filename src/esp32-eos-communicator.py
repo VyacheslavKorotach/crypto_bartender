@@ -14,24 +14,31 @@ topic_pub1 = 'wine_vendor/knygarnya111/device0001/ctl'
 # eos_endpoint = 'https://eos.greymass.com:443'
 # eos_endpoint = 'https://eosapi.blockmatrix.network:443'
 # eos_endpoint = 'https://eu1.eosdac.io:443'
-eos_endpoint = 'https://eosbp.atticlab.net'
+eos_endpoint = 'https://eosbp.atticlab.net' #last working
+# eos_endpoint = 'https://api.testnet.eos.io' #History Ok*0,5
 # eos_endpoint = 'https://api.eossweden.org'
+# eos_endpoint = 'http://junglehistory.cryptolions.io:18888'
 depth = 33
 mqtt_host = os.environ['WINE_VENDOR_MQTT_HOST']
 mqtt_user = os.environ['WINE_VENDOR_MQTT_USER']
 mqtt_password = os.environ['WINE_VENDOR_MQTT_PASSWORD']
 bartender_account = 'wealthysnake'
+# bartender_account = 'gaxdyyrkwguk'
 active_privat_key = os.environ['WINE_VENDOR_PRIVAT_KEY']
-price = {'EOS': 0.5639, 'KNYGA': 50.0000}
+# price = {'EOS': 0.5639, 'KNYGA': 50.0000}
+price = {'TNT': 0.5639, 'EOS': 0.5639, 'KNYGA': 50.0000}
 memo_msgs = ["Not enough money, the price of wine is: ",
              "It's too much. Take the change back. The price of wine is: ",
              "Thank you for visiting Knygarium. See you again soon!", "Something went wrong. Take your money back. "]
 delay_max = 21  # sec - it's max delay from device
 vendor_account = 'wealthytiger'
+# vendor_account = 'pawhjmizyyqy'
 vendor_part = 0.4
 owner_account = 'cryptotexty1'
+# owner_account = 'qzlzkaeaclwc'
 owner_part = 0.4
 support_account = 'destitutecat'
+# support_account = 'hojwakobvfsa'
 support_part = 1 - vendor_part - owner_part
 
 
@@ -136,6 +143,7 @@ def get_last_actions():
     out = {}
     ce = Cleos(url=eos_endpoint)
     actions = ce.get_actions(bartender_account, pos=-1, offset=-depth)
+    # actions = ce.get_actions('hojwakobvfsa', pos=-1, offset=-1)
     if 'actions' in actions.keys():
         out = actions['actions']
     memos = []
@@ -197,7 +205,8 @@ def refund(action, amount, memo):
 
 
 def send_tokens(token, account_to, quantity, memo):
-    contract_accounts = {'EOS': 'eosio.token', 'KNYGA': 'knygarium111'}
+    # contract_accounts = {'EOS': 'eosio.token', 'KNYGA': 'knygarium111'}
+    contract_accounts = {'TNT': 'eosio.token', 'EOS': 'eosio.token', 'KNYGA': 'knygarium111'}
     ce = Cleos(url=eos_endpoint)
     quantity_str = str(quantity)
     qs_start = quantity_str[:quantity_str.find('.')]
