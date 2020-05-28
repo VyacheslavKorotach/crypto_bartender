@@ -99,9 +99,12 @@ transfer_memo = 'test memo'
 # print(actions)
 print(get_EOS_balance(receiver_account))
 
-import pandas as pd
-
-# tables = pd.read_html("https://junglehistory.cryptolions.io/v2/history/get_actions?limit=3&account=wealthysnake")
-tables = pd.read_html("http://egle.ua")
-
-print(tables[0])
+response = requests.get('https://junglehistory.cryptolions.io/v2/history/get_actions?limit=1&account=wealthysnake')
+print(response)
+print(response.json())
+print(response.json()['actions'][0]['act']['data'])
+print(response.json()['actions'][0]['act']['data']['from'])
+print(response.json()['actions'][0]['act']['data']['to'])
+print(response.json()['actions'][0]['act']['data']['amount'])
+print(response.json()['actions'][0]['act']['data']['symbol'])
+print(response.json()['actions'][0]['global_sequence'])
