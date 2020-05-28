@@ -1,4 +1,3 @@
-import json
 from eospy.cleos import Cleos
 import eospy.cleos
 import eospy.keys
@@ -7,51 +6,44 @@ import requests
 
 
 class EOSCryptoAccount:
-    __account = ''
-    __api_endpoint = ''
-    __history_endpoint = ''
-    __depth = 8
-    __active_privat_key = ''
-    __last_global_sequence = 0
-    __balance = [{}]
-    __last_actions = {}
-
     def __init__(self, account: str, api_endpoint: str, history_endpoint: str, active_privat_key: str, currencies):
-        self.__account = account
-        self.__api_endpoint = api_endpoint
-        self.__history_endpoint = history_endpoint
-        self.__active_privat_key = active_privat_key
-        self.__last_actions = self.get_actions()
-        self.__currencies = dict()
+        self._depth = 8
+        self._last_global_sequence = 0
+        self._account = account
+        self._api_endpoint = api_endpoint
+        self._history_endpoint = history_endpoint
+        self._active_privat_key = active_privat_key
+        self.get_actions()
+        self._currencies = dict()
         for currency in currencies:
-            self.__currencies[currency['symbol']] = currency['code']
+            self._currencies[currency['symbol']] = currency['code']
 
     def get_actions(self):
-        request_str = self.__history_endpoint + '/v2/history/get_actions?limit=' + \
-                      str(self.__depth) + '&account=' + self.__account
+        request_str = self._history_endpoint + '/v2/history/get_actions?limit=' + \
+                      str(self._depth) + '&account=' + self._account
 
         response = requests.get(request_str)
         response_json = response.json()
         if request_str:
-            self.__last_global_sequence = response_json['actions'][0]['global_sequence']
+            self._last_global_sequence = response_json['actions'][0]['global_sequence']
         return response_json
 
     def get_new_payments(self):
-        old_last_sequence = self.__last_global_sequence
+        old_last_sequence = self._last_global_sequence
         actions_json = self.get_actions()
         new_payments = []
         i = 0
         while actions_json['actions'][i]['global_sequence'] > old_last_sequence:
             if actions_json['actions'][i]['act']['name'] == 'transfer' and \
-                    self.__currencies[actions_json['actions'][i]['act']['data']['symbol']] == \
+                    self._currencies[actions_json['actions'][i]['act']['data']['symbol']] == \
                     actions_json['actions'][i]['act']['account'] and \
-                    actions_json['actions'][i]['act']['data']['to'] == self.__account:
+                    actions_json['actions'][i]['act']['data']['to'] == self._account:
                 new_payments.append(actions_json['actions'][i])
             i += 1
         return new_payments
 
     def send_tokens(self, token, account_to, amount, memo):
-        ce = Cleos(url=self.__api_endpoint)
+        ce = Cleos(url=self._api_endpoint)
         quantity_str = str(amount)
         qs_start = quantity_str[:quantity_str.find('.')]
         qs_end = quantity_str[quantity_str.find('.'):]
@@ -64,16 +56,16 @@ class EOSCryptoAccount:
             qs_end = qs_end + '0'
         quantity_str = qs_start + qs_end
         arguments = {
-            "from": self.__account,  # sender
+            "from": self._account,  # sender
             "to": account_to,  # receiver
             "quantity": quantity_str + ' ' + token,  # In Token
             "memo": memo,
         }
         payload = {
-            "account": self.__currencies[token],
+            "account": self._currencies[token],
             "name": 'transfer',
             "authorization": [{
-                "actor": self.__account,
+                "actor": self._account,
                 "permission": 'active',
             }],
         }
@@ -85,7 +77,7 @@ class EOSCryptoAccount:
         trx = {"actions": [payload]}
         import datetime as dt
         trx['expiration'] = str((dt.datetime.utcnow() + dt.timedelta(seconds=60)).replace(tzinfo=pytz.UTC))
-        key = eospy.keys.EOSKey(self.__active_privat_key)
+        key = eospy.keys.EOSKey(self._active_privat_key)
         resp = ce.push_transaction(trx, key, broadcast=True)
         if 'transaction_id' in resp.keys():
             print(f'{amount} {token} sent to {account_to}')

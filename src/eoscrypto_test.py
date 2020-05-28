@@ -11,7 +11,7 @@ bartender_account = EOSCryptoAccount('wealthysnake', 'http://jungle.atticlab.net
 print(bartender_account.get_actions())
 # print(bartender_account.last_global_sequence)
 bartender_account.send_tokens('EOS', 'wealthytiger', 0.007, 'for wine transaction #')
-print('sent')
+# print('sent')
 i = 0
 while True:
     new_payments = bartender_account.get_new_payments()
