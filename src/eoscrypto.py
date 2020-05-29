@@ -38,7 +38,8 @@ class EOSCryptoAccount:
                     self._currencies[actions_json['actions'][i]['act']['data']['symbol']] == \
                     actions_json['actions'][i]['act']['account'] and \
                     actions_json['actions'][i]['act']['data']['to'] == self._account:
-                new_payments.append(actions_json['actions'][i])
+                # new_payments.append(actions_json['actions'][i])
+                new_payments.append(actions_json['actions'][i]['act']['data'])
             i += 1
         return new_payments
 
