@@ -1,4 +1,5 @@
 import json
+import time
 import paho.mqtt.client as mqtt
 import datetime as dt
 
@@ -13,8 +14,10 @@ class VMachine:
         self._topic_sub = f'{topic_sub}/{device_name}'
         self._topic_pub = f'{topic_pub}/{device_name}'
         self._last_ping_time = dt.datetime(1974, 7, 21)  # author's birthday :)
-        self._activity_period = 15  # time (in seconds) to consider the device as inactive
         self._status = 'Off'
+
+        self.activity_period = 180  # time (in seconds) to consider the device is inactive
+        self.processing_period = 30  # time (in seconds) to consider the device can't execute command
 
         self._mqttc = mqtt.Client()
         # Assign event callbacks
@@ -32,10 +35,30 @@ class VMachine:
 
     def status(self):
         delta = dt.datetime.utcnow() - self._last_ping_time
-        if delta.seconds > self._activity_period:
+        if delta.seconds > self.activity_period:
             self._status = 'Off'
         # return f'Ready {dt.datetime.utcnow()} delta is {delta.seconds}'
-        return self._status
+        return self._status  # can be 'Off', 'Reset', 'Ready', 'Busy' or 'Ok'
+
+    def reset(self):
+        self._mqttc.publish(self._topic_pub, '{"code": "reset"}')
+        self._status = 'Reset'
+
+    def give_the_goods(self, customer: str):
+        self._mqttc.publish(self._topic_pub, f'{{"code": "give_the_goods", "customer": "{customer}"}}')
+        self._status = 'Busy'
+        start_time = dt.datetime.utcnow()
+        delta = dt.datetime.utcnow() - start_time
+        while self._status == 'Busy' and delta.seconds < self.processing_period:
+            time.sleep(1)
+            delta = dt.datetime.utcnow() - start_time
+            print(f'processing {delta.seconds}')
+        if self._status == 'Ok':
+            self.reset()
+            return True
+        else:
+            self._status = 'Error'
+            return False
 
     def on_connect(self, mosq, obj, flags, rc):
         self._mqttc.subscribe(self._topic_sub, 0)
@@ -44,48 +67,23 @@ class VMachine:
     def on_message(self, mosq, obj, msg):
         """
         get the status string from device
-        {"recv_sequence": 32, "status": "OK"} or {"recv_sequence": 32, "status": "Error"}
-        or {"status": "Restart"}
+        {"status": "Ok"} or {"status": "Error"} or {"status": "Busy"}
+        or {"status": "Ready"}
         """
-        # global state
-        self._status = 'Ready'
-        print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
-        self._last_ping_time = dt.datetime.utcnow()
+        print(f'{msg.topic} {str(msg.qos)} {str(msg.payload)}')
+        self._last_ping_time = dt.datetime.utcnow()  # got a ping
         json_string = ''
         d = {}
         try:
             json_string = msg.payload.decode('utf8')
         except UnicodeDecodeError:
-            print("it was not a ascii-encoded unicode string")
-        print('json_string = ', json_string)
+            print("it was not an ASCII encoded Unicode string")
+        # print('json_string = ', json_string)
         if json_string != '' and self.is_json(json_string):
             d = json.loads(json_string)
             if 'status' in d.keys():
-                if d['status'].find('OK') != -1 \
-                        and 'recv_sequence' in d.keys() and d['recv_sequence'] == goods_number:
-                    self._status = 'we successfully have gave goods out'
-                elif d['status'].find('Error') != -1:
-                    self._status = 'We have received the Error code from device.'
-                elif d['status'].find('Restart') != -1:
-                    self._status = 'Restart'
-                elif d['status'].find('Empty') != -1:
-                    self._status = 'Crypto-vendor is empty.'
-                    pass
-                elif d['status'].find('Ready') != -1:
-                    self._status = 'Crypto-vendor is ready.'
-                    pass
-                elif d['status'].find('Busy') != -1:
-                    self._status = 'Crypto-vendor is busy.'
-                    pass
-                elif d['status'].find('NO CONNECT') != -1:
-                    self._status = 'NO CONNECT'
-                    pass
-                else:
-                    self._status = 'We have received a wrong message from device. Stop crypto-bartender.'
-            else:
-                self._status = 'We have received a wrong message from device. Stop crypto-bartender.'
-
-    #    if debug: print('state = ', state)
+                self._status = d['status']
+                print(self._status)
 
     def on_publish(self, mosq, obj, mid):
         print("mid: " + str(mid))
