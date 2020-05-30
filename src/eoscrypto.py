@@ -43,9 +43,9 @@ class EOSCryptoAccount:
             i += 1
         return new_payments
 
-    def send_tokens(self, token, account_to, amount, memo):
+    def send_tokens(self, account_to: str, amount: float, token: str, memo: str):
         ce = Cleos(url=self._api_endpoint)
-        quantity_str = str(amount)
+        quantity_str = str(float(amount))
         qs_start = quantity_str[:quantity_str.find('.')]
         qs_end = quantity_str[quantity_str.find('.'):]
         needs_0 = 5 - len(qs_end)
@@ -81,7 +81,7 @@ class EOSCryptoAccount:
         key = eospy.keys.EOSKey(self._active_privat_key)
         resp = ce.push_transaction(trx, key, broadcast=True)
         if 'transaction_id' in resp.keys():
-            print(f'{amount} {token} sent to {account_to}')
+            print(f'{amount} {token} sent to {account_to} with memo: {memo}')
             return float(quantity_str)
         else:
             print(f'error sending {amount} {token} to {account_to}')

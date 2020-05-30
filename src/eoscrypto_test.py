@@ -10,7 +10,8 @@ bartender_account = EOSCryptoAccount('wealthysnake', 'http://jungle.atticlab.net
                                      'https://junglehistory.cryptolions.io', active_privat_key, price)
 print(bartender_account.get_actions())
 # print(bartender_account.last_global_sequence)
-bartender_account.send_tokens('EOS', 'wealthytiger', 0.007, 'for wine transaction #')
+# bartender_account.send_tokens('wealthytiger', 0.007, 'EOS', 'for wine transaction #')
+bartender_account.send_tokens('winecustomer', 0.0021, 'EOS', 'Not enough money sent. The price is 0.5639 EOS')
 # print('sent')
 i = 0
 while True:
