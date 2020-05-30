@@ -4,13 +4,11 @@ from eoscrypto import EOSCryptoAccount
 from vmachine import VMachine
 from communicator import IoTEOSCommunicator
 
-# price = [{'code': 'eosio.token', 'symbol': 'EOS', 'amount': 0.5639},
-#          {'code': 'winecustomer', 'symbol': 'KNYGA', 'amount': 50}]
-# price = [{'code': 'eosio.token', 'symbol': 'EOS', 'amount': 0.5639},
-#          {'code': 'eosio.token', 'symbol': 'JUNGLE', 'amount': 50}]
 price = [{'code': 'eosio.token', 'symbol': 'EOS', 'amount': 0.5639},
-         {'code': 'eosio.token', 'symbol': 'JUNGLE', 'amount': 50},
-         {'code': 'winecustomer', 'symbol': 'KNYGA', 'amount': 50}]
+         {'code': 'eosio.token', 'symbol': 'JUNGLE', 'amount': 50}]
+# price = [{'code': 'eosio.token', 'symbol': 'EOS', 'amount': 0.5639},
+#          {'code': 'eosio.token', 'symbol': 'JUNGLE', 'amount': 50},
+#          {'code': 'winecustomer', 'symbol': 'KNYGA', 'amount': 50}]
 
 share_agreement = {'wealthytiger': 0.4, 'cryptotexty1': 0.4, 'destitutecat': 0.2}
 # vendor account - 'wealthytiger'  vendor part - 40% * income
