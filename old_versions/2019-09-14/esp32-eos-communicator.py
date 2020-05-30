@@ -17,7 +17,7 @@ topic_pub1 = 'wine_vendor/knygarnya111/device0001/ctl'
 eos_endpoint = 'https://eosbp.atticlab.net' #last working
 # eos_endpoint = 'https://api.testnet.eos.io' #History Ok*0,5
 # eos_endpoint = 'https://api.eossweden.org'
-# eos_endpoint = 'http://junglehistory.cryptolions.io:18888'
+# eos_endpoint = 'http://jungle.atticlab.net:8888'
 depth = 33
 mqtt_host = os.environ['WINE_VENDOR_MQTT_HOST']
 mqtt_user = os.environ['WINE_VENDOR_MQTT_USER']
@@ -289,7 +289,6 @@ def money_distribute(income, token):
         return True
     else:
         return False
-
 
 mqttc = mqtt.Client()
 # Assign event callbacks

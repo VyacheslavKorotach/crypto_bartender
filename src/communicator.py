@@ -40,6 +40,7 @@ class IoTEOSCommunicator:
                     income['amount'] = goods_price
                     print(f'we have {goods_price} {symbol} income')
                 else:  # something went wrong. refund all money.
+                    memo = 'Something went wrong :('
                     self._account.send_tokens(customer, amount, symbol, memo)
             else:  # amount == goods_price
                 if self._vmachine.give_the_goods(customer):

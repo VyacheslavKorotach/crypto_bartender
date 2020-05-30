@@ -35,10 +35,10 @@ class EOSCryptoAccount:
         i = 0
         while actions_json['actions'][i]['global_sequence'] > old_last_sequence:
             if actions_json['actions'][i]['act']['name'] == 'transfer' and \
+                    actions_json['actions'][i]['act']['data']['symbol'] in self._currencies and \
                     self._currencies[actions_json['actions'][i]['act']['data']['symbol']] == \
                     actions_json['actions'][i]['act']['account'] and \
                     actions_json['actions'][i]['act']['data']['to'] == self._account:
-                # new_payments.append(actions_json['actions'][i])
                 new_payments.append(actions_json['actions'][i]['act']['data'])
             i += 1
         return new_payments
@@ -70,7 +70,6 @@ class EOSCryptoAccount:
                 "permission": 'active',
             }],
         }
-        # Converting payload to binary
         data = ce.abi_json_to_bin(payload['account'], payload['name'], arguments)
         # Inserting payload binary form as "data" field in original payload
         payload['data'] = data['binargs']
