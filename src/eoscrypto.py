@@ -81,8 +81,8 @@ class EOSCryptoAccount:
         key = eospy.keys.EOSKey(self._active_privat_key)
         resp = ce.push_transaction(trx, key, broadcast=True)
         if 'transaction_id' in resp.keys():
-            print(f'{amount} {token} sent to {account_to} with memo: {memo}')
+            print(f'{quantity_str} {token} sent to {account_to} with memo: {memo}')
             return float(quantity_str)
         else:
-            print(f'error sending {amount} {token} to {account_to}')
+            print(f'error sending {quantity_str} {token} to {account_to}')
             return 0

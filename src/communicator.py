@@ -54,5 +54,20 @@ class IoTEOSCommunicator:
         return income
 
     def share_income_according_to_agreement(self, income, share_agreement):
-        pass
+
+        """
+        income - {'symbol': 'EOS', 'amount': 0.5388} or {'symbol': 'KNYGA', 'amount': 50.0000}
+        share_agreement - {'wealthytiger': 0.4, 'cryptotexty1': 0.4, 'destitutecat': 0.2}
+        """
+
+        symbol = income['symbol']
+        amount = income['amount']
+        sum_of_parts = 0
+        for partner in share_agreement:
+            sum_of_parts += share_agreement[partner]
+            if sum_of_parts > 1:
+                return False
+            memo = f'{share_agreement[partner] * 100}% for the sale of goods'
+            if not self._account.send_tokens(partner, amount * share_agreement[partner], symbol, memo):
+                return False
         return True
