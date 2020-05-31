@@ -16,7 +16,7 @@ class VMachine:
         self._last_ping_time = dt.datetime(1974, 7, 21)  # author's birthday :)
         self._status = 'Off'
 
-        self.activity_period = 180  # time (in seconds) to consider the device is inactive
+        self.activity_period = 60  # time (in seconds) to consider the device is inactive
         self.processing_period = 30  # time (in seconds) to consider the device can't execute command
 
         self._mqttc = mqtt.Client()
@@ -30,19 +30,20 @@ class VMachine:
         # Connect
         self._mqttc.connect(mqtt_host, mqtt_port, 60)
         # Continue the network loop
-        # mqttc.loop_forever()
         self._mqttc.loop_start()
 
     def status(self):
         delta = dt.datetime.utcnow() - self._last_ping_time
         if delta.seconds > self.activity_period:
             self._status = 'Off'
-        # return f'Ready {dt.datetime.utcnow()} delta is {delta.seconds}'
-        return self._status  # can be 'Off', 'Reset', 'Ready', 'Busy' or 'Ok'
+        return self._status  # can be 'Off', 'Reset', 'Ready', 'Busy', 'Ok' or 'Error'
 
     def reset(self):
         self._mqttc.publish(self._topic_pub, '{"code": "reset"}')
         self._status = 'Reset'
+
+    def ping(self):
+        self._mqttc.publish(self._topic_pub, '{"code": "ping"}')
 
     def give_the_goods(self, customer: str):
         self._mqttc.publish(self._topic_pub, f'{{"code": "give_the_goods", "customer": "{customer}"}}')
@@ -72,13 +73,13 @@ class VMachine:
         """
         print(f'{msg.topic} {str(msg.qos)} {str(msg.payload)}')
         self._last_ping_time = dt.datetime.utcnow()  # got a ping
+        self.ping()
         json_string = ''
         d = {}
         try:
             json_string = msg.payload.decode('utf8')
         except UnicodeDecodeError:
             print("it was not an ASCII encoded Unicode string")
-        # print('json_string = ', json_string)
         if json_string != '' and self.is_json(json_string):
             d = json.loads(json_string)
             if 'status' in d.keys():

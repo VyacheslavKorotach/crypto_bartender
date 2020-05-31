@@ -29,6 +29,10 @@ class IoTEOSCommunicator:
             amount = payment['amount']
             customer = payment['from']
             goods_price = price[currency_num]['amount']
+            if self._vmachine.status() == 'Off':
+                memo = 'Device is Off'
+                self._account.send_tokens(customer, amount, symbol, memo)
+                return income
             if amount < goods_price:
                 memo = f'Not enough money sent. The price is {goods_price} {symbol}'
                 self._account.send_tokens(customer, amount, symbol, memo)
