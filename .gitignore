@@ -29,4 +29,8 @@ Temporary Items
 
 .idea/libraries/
 venv_clean/
-Dockerfile
+Dockerfile_hidden
+
+config/reck_back.pip
+Dockerfile_hidden
+src/__pycache__/
