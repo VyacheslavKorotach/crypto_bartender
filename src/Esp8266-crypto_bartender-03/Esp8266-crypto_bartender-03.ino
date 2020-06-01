@@ -1,3 +1,4 @@
+//Release v0.0.2 2020-05-31
 // The Pump attached to GPIO0 (D3)
 // The Flow sensor attached to GPIO2 (D4)
 // Humidity sensor attached to GPI14 (D5)
