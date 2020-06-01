@@ -27,11 +27,10 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-.idea/libraries/
+.idea/
 venv_clean/
 Dockerfile_hidden
 
 config/reck_back.pip
 Dockerfile_hidden
 src/__pycache__/
-.idea/
