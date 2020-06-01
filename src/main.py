@@ -1,8 +1,9 @@
 import os
 import time
+
+from communicator import IoTEOSCommunicator
 from eoscrypto import EOSCryptoAccount
 from vmachine import VMachine
-from communicator import IoTEOSCommunicator
 
 price = [{'code': 'eosio.token', 'symbol': 'EOS', 'amount': 0.5639},
          {'code': 'eosio.token', 'symbol': 'JUNGLE', 'amount': 50}]
